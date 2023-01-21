@@ -1,0 +1,19 @@
+{
+  "name": "knights-travails",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rarAndy/Knights-Travails.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rarAndy/Knights-Travails/issues"
+  },
+  "homepage": "https://github.com/rarAndy/Knights-Travails#readme"
+}

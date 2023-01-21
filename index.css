@@ -1,0 +1,33 @@
+.cell-row {
+    display: grid;
+}
+
+.cell-row:nth-child(2n+1)>.cell:nth-child(2n+1), .cell-row:nth-child(2n)>.cell:nth-child(2n) {
+    background-color: antiquewhite;
+}
+
+.cell-row:nth-child(2n+1)>.cell:nth-child(2n), .cell-row:nth-child(2n)>.cell:nth-child(2n+1) {
+    background-color:rgb(130, 180, 145);
+}
+
+.cell.active{
+    box-shadow: 0px 0px 13px 0px;
+    z-index: 2;
+}
+
+.knight {
+    position: absolute;
+    height: 50px;
+    left: 300px;
+    z-index: 99;
+}
+
+.target-circle {
+    
+    height: 90%;
+    width: 90%;
+    border: 3px solid rgb(216, 19, 19);;
+    border-radius: 50%;
+    z-index: 3;
+
+}
