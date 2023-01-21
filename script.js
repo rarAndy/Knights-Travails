@@ -11,13 +11,19 @@ boardSizeSlider.addEventListener('click', () => {
     x=[];
     y=[];
     for (let i = 0; i < boardSize; i++){
-    x.push(i)
-    y.push(i)
-}
+        x.push(i)
+        y.push(i)
+    }
     
-    createBoard()
-    addTargets()
+    createBoard();
+    getCellCoords();
+    addTargets();
+    initializeKnight();
+    updateKnightDimensions();
+    document.querySelector('.solution').textContent = ''
 })
+
+
 for (let i = 0; i < boardSize; i++){
     x.push(i)
     y.push(i)
@@ -166,35 +172,25 @@ knight.addEventListener('mousedown', function(e){
     document.addEventListener('mousemove', mouseMove);
 
     
-    document.addEventListener('mouseup', function(){
-/*         let index = 0
-        for (let i = x.length-1; i >= 0; i--){
-            for (let j = 0; j < y.length; j++){
-                if (index == mid[0].id) {
-                    console.log(j, i)
-                    currentPos = [j, i]
-                }
-                index += 1;
-            }
-            
-        }
- */     console.log(mid[0])
-        currentPos = findBoardIndices(mid[0])
-        console.log('knightPos', currentPos)
-        newPosX = mid[1];
-        newPosY = mid[2]; 
-        let knightDimensions = [knight.offsetWidth, knight.offsetHeight]
-        knight.style.top = (newPosY-knightDimensions[1]/2)+ "px";
-        knight.style.left = (newPosX-knightDimensions[0]/2)+ "px";
-
-
-        document.querySelectorAll('.cell').forEach(e => {
-            e.classList.remove('active')
-        })
-        document.removeEventListener('mousemove', mouseMove);
-        
-    });
+    document.addEventListener('mouseup', mouseUp);
 });
+
+function mouseUp() {
+    console.log(mid[0])
+    currentPos = findBoardIndices(mid[0])
+    console.log('knightPos', currentPos)
+    newPosX = mid[1];
+    newPosY = mid[2]; 
+    let knightDimensions = [knight.offsetWidth, knight.offsetHeight]
+    knight.style.top = (newPosY-knightDimensions[1]/2)+ "px";
+    knight.style.left = (newPosX-knightDimensions[0]/2)+ "px";
+
+    document.querySelectorAll('.cell').forEach(e => {
+        e.classList.remove('active')
+    })
+    document.removeEventListener('mousemove', mouseMove);
+    document.removeEventListener('mouseup', mouseUp)
+}
 
 function findBoardIndices(cellDom) {
     let index = 0
@@ -317,9 +313,13 @@ function createBoard() {
 
 function addTargets () {
     document.querySelectorAll('.cell').forEach((cell) => {
+        
         cell.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             const targetCircle = document.createElement('div');
+            document.querySelectorAll('.cell').forEach((cell) => {
+                if (cell.hasChildNodes()) {cell.textContent = ''}
+            })
             targetCircle.classList.add('target-circle')
             cell.appendChild(targetCircle)
             console.log(cell)
@@ -340,16 +340,32 @@ function checkBoardStatus() {
     }
 }
 
+function updateKnightDimensions() {
+    let newWidth = document.querySelector('.cell').offsetWidth * 0.55
+    console.log(newWidth)
+    knight.style.width = `${newWidth}px`
+}
+
 document.querySelector('.calculate-button').addEventListener('click', () => {
+    
     let path = new Moves(currentPos);
     let correctMoves = path.buildTree();
     console.log(correctMoves)
     const solutionText = document.querySelector('.solution')
+    solutionText.textContent = ''
     correctMoves.forEach((e) => {
         solutionText.textContent += `[${e}]\n`
     })
     
 })
+
+let knightStartCoords = [knight.offsetTop, knight.offsetLeft]
+console.log(knightStartCoords)
+function initializeKnight() {
+    knight.style.top = knightStartCoords[0] + 502 + "px";
+    knight.style.left = knightStartCoords[1] + "px";
+}
+
 
 createBoard();
 checkBoardStatus();
