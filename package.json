@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/rarAndy/Knights-Travails/issues"
   },
-  "homepage": "https://github.com/rarAndy/Knights-Travails#readme"
+  "homepage": "https://github.com/rarAndy/Knights-Travails#readme",
+  "dependencies": {
+    "animejs": "^3.2.1"
+  }
 }

@@ -1,4 +1,6 @@
 import {arrayEqualsArray, isArrayInArray} from './arrayFunctions.js'
+import anime from './node_modules/animejs/lib/anime.es.js';
+
 
 let x = []
 let y = []
@@ -17,6 +19,7 @@ boardSizeSlider.addEventListener('click', () => {
     
     createBoard();
     getCellCoords();
+    console.log(coords)
     addTargets();
     initializeKnight();
     updateKnightDimensions();
@@ -125,7 +128,7 @@ class Moves {
                     correctMoves.push(current.data)
                     current = current.parent;
                 }
-                correctMoves.push(this.root.data)
+                //correctMoves.push(this.root.data)
                 correctMoves = correctMoves.reverse()
 
                 return correctMoves;
@@ -239,14 +242,16 @@ function mouseMove(e) {
 
 let coords = []
 function getCellCoords() {
-    
+    coords = []
     document.querySelectorAll('.cell').forEach((cell) => {        
         let left = cell.offsetLeft
         let top = cell.offsetTop
         let right = left + cell.offsetWidth
-        let bottom = top + cell.offsetHeight            
+        let bottom = top + cell.offsetHeight
+        let midpoint = [(left + right)/2, (top + bottom)/2] 
+        let index = findBoardIndices(cell)     
         //console.log(`left: ${left} \ntop: ${top} \nright: ${right} \nbottom: ${bottom}`)
-        coords.push({cell, left, top, right, bottom})
+        coords.push({cell, left, top, right, bottom, midpoint, index})
     })
     //console.log(coords)
     return coords;
@@ -356,7 +361,7 @@ document.querySelector('.calculate-button').addEventListener('click', () => {
     correctMoves.forEach((e) => {
         solutionText.textContent += `[${e}]\n`
     })
-    
+    animateKnight(correctMoves)
 })
 
 let knightStartCoords = [knight.offsetTop, knight.offsetLeft]
@@ -369,6 +374,102 @@ function initializeKnight() {
 
 createBoard();
 checkBoardStatus();
-    
 
+let id = null;
+function animateKnight (moveArray){
+    
+    function getMidCoords() {
+        let coordsArray = [];
+        moveArray.forEach(move => {
+            coords.forEach((coord => {
+                //console.log(coord.index, move)
+                if (arrayEqualsArray(coord.index, move)){
+                    coordsArray.push(coord.midpoint);
+                    return
+                };
+            }));
+        });
+        //console.log(coordsArray)
+        return coordsArray;
+    }
+    const midCoords = getMidCoords()
+
+    let knightDimensions = [knight.offsetWidth, knight.offsetHeight]
+    let currentTargets = midCoords.map((coord) => {
+        return [coord[0]-knightDimensions[0]/2, coord[1]-knightDimensions[1]/2]
+    })
+    //console.log(currentTargets)
+
+    let posX = Number(knight.style.left.replace('px', ''));
+    let posY = Number(knight.style.top.replace('px', ''));
+
+    let timeline = anime.timeline({
+        targets: '.knight',
+        easing: 'easeInOutSine',
+        duration: 500,
+    });
+
+    function moveToTarget(target){
+        //console.log(target)
+        if (posX > target[0]) {
+            //console.log(posX,  target[0])
+            timeline.add({
+                translateX: -(posX-target[0])
+            })
+        }
+ 
+        else if (posX < target[0]) {
+            //console.log(posX,  target[0])
+            timeline.add({
+                translateX: target[0]-posX
+            })
+        }
+        if (posY > target[1]) {
+            //console.log(posY,  target[1])
+            timeline.add({
+                translateY: -(posY-target[1])
+            })
+        }
+ 
+        else if (posY < target[1]) {
+            //console.log(posY,  target[1])
+            timeline.add({
+                translateY: target[1]-posY
+            })          
+        }
+    }
+
+    moveToTarget(currentTargets[0])
+    timeline.finished.then(updateParams)
+    
+    let index = 0
+    function updateParams() {
+        //Reset timeline to 0
+        timeline = anime.timeline({
+            targets: '.knight',
+            easing: 'easeInOutSine',
+            duration: 500,
+        });
+        
+        //Repositions knight from transformation to coordinates
+        knight.style.removeProperty('transform')
+        knight.style.left = currentTargets[index][0] + 'px'
+        knight.style.top = currentTargets[index][1] + 'px'
+        //console.log(knight.style.left, knight.style.top)
+
+        //Updates posX and posY
+        posX = Number(knight.style.left.replace('px', ''));
+        posY = Number(knight.style.top.replace('px', ''));
+
+        index += 1;
+        console.log('move', index);
+        if (index >= currentTargets.length){return}      
+    
+        //Adds X and Y promises to the timeline, then once finished, updates again
+        moveToTarget(currentTargets[index])
+        timeline.finished.then(updateParams)
+    }
+}
+    
+console.log(coords)
 
