@@ -384,7 +384,7 @@ function animateKnight (moveArray){
             coords.forEach((coord => {
                 //console.log(coord.index, move)
                 if (arrayEqualsArray(coord.index, move)){
-                    coordsArray.push(coord.midpoint);
+                    coordsArray.push([coord.midpoint, coord.index]);
                     return
                 };
             }));
@@ -393,10 +393,11 @@ function animateKnight (moveArray){
         return coordsArray;
     }
     const midCoords = getMidCoords()
+    console.log(midCoords)
 
     let knightDimensions = [knight.offsetWidth, knight.offsetHeight]
     let currentTargets = midCoords.map((coord) => {
-        return [coord[0]-knightDimensions[0]/2, coord[1]-knightDimensions[1]/2]
+        return [coord[0][0]-knightDimensions[0]/2, coord[0][1]-knightDimensions[1]/2]
     })
     //console.log(currentTargets)
 
@@ -455,6 +456,7 @@ function animateKnight (moveArray){
         knight.style.removeProperty('transform')
         knight.style.left = currentTargets[index][0] + 'px'
         knight.style.top = currentTargets[index][1] + 'px'
+        currentPos = midCoords[index][1]
         //console.log(knight.style.left, knight.style.top)
 
         //Updates posX and posY
