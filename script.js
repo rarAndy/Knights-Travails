@@ -32,27 +32,6 @@ for (let i = 0; i < boardSize; i++){
     y.push(i)
 }
 
-
-/* function getMoves(pos) {
-    let moves = []
-    moves.push([x[pos[0]-2], y[pos[1]-1]])
-    moves.push([x[pos[0]-1], y[pos[1]-2]])
-
-    moves.push([x[pos[0]-2], y[pos[1]+1]])
-    moves.push([x[pos[0]-1], y[pos[1]+2]])
-
-    moves.push([x[pos[0]+2], y[pos[1]-1]])
-    moves.push([x[pos[0]+1], y[pos[1]-2]])
-
-    moves.push([x[pos[0]+2], y[pos[1]+1]])
-    moves.push([x[pos[0]+1], y[pos[1]+2]])
-    moves = moves.filter(move => move[0] && move[1] != undefined)
-    console.log(moves)
-    return moves
-}
-
-getMoves(knight) */
-
 class Node {
     constructor(data) {
         this.data = data;
@@ -76,21 +55,12 @@ class Moves {
         q.push(this.root);
 
         while (q) {
-            //console.log('depth', depth)
-            //console.log('queue', q)
-
             for (let i = 0; i < q.length; i++) {
-                //console.log(visitedList)
+
                 current = q.shift();
-                //console.log('current data',current.data)
                 visitedList.push(current.data);
-                //console.log('visited list', visitedList)
                 let dataQueue = q.map(e => e.data)
-                //console.log('dataQueue', dataQueue)
-                
-                //console.log(current)
-                //console.log(current.data, target, current.data[0] == target[0] && current.data[1] == target[1])
-                
+
                 if (current.data[0] == target[0] && current.data[1] == target[1]) {
                     isSolved = true;
                     break;
@@ -98,24 +68,16 @@ class Moves {
                 
                 let newMoves = this.getMoves(current.data)
                 newMoves.forEach(e => {
-                    //console.log('visited list', visitedList)
-                    //console.log('e',e)
-                    //console.log('visited before?', isArrayInArray(visitedList, e))
-                    //console.log('in queue?', isArrayInArray(dataQueue, e))
                     if (!isArrayInArray(visitedList, e) && !isArrayInArray(dataQueue, e)){
-                        //console.log('newnode')
                         const newNode = new Node(e)
                         newNode.parent = current
 
                         current.children.push(newNode);
                     }
                 });
-                //console.log('current', current.data, 'children', current.children)
+                
                 current.children.forEach(e => {q.push(e)})
                 dataQueue = q.map(e => e.data)
-                //console.log('updated q', dataQueue)
-    
-                
             }
             depth += 1
 
@@ -128,7 +90,6 @@ class Moves {
                     correctMoves.push(current.data)
                     current = current.parent;
                 }
-                //correctMoves.push(this.root.data)
                 correctMoves = correctMoves.reverse()
 
                 return correctMoves;
@@ -149,18 +110,21 @@ class Moves {
 
         moves.push([x[pos[0]+2], y[pos[1]+1]])
         moves.push([x[pos[0]+1], y[pos[1]+2]])
-        moves = moves.filter(move => (move[0] && move[1]) != undefined)
-
+        
+        moves = moves.filter(move => (move[0] != undefined && move[1]!= undefined))
+        
         return moves
+    }
+
+    getRoot(){
+        return this.root
     }
 }
 
-let knightPos = [7, 7];
-let target = [0, 0];
+let knightPos = [];
+let target = [];
 let currentPos = [];
-
-let path = new Moves(knightPos)
-path.buildTree()
+let currentTree = []
 
 let knight = document.querySelector('.knight');
 let newPosX = 0, newPosY = 0, startPosX = 0, startPosY = 0;
@@ -174,7 +138,6 @@ knight.addEventListener('mousedown', function(e){
     
     document.addEventListener('mousemove', mouseMove);
 
-    
     document.addEventListener('mouseup', mouseUp);
 });
 
@@ -200,7 +163,6 @@ function findBoardIndices(cellDom) {
     for (let i = x.length-1; i >= 0; i--){
         for (let j = 0; j < y.length; j++){
             if (index == cellDom.id) {
-                //console.log(j, i)
                 return [j, i];
             }
             index += 1;
@@ -210,7 +172,6 @@ function findBoardIndices(cellDom) {
 
 let mid;
 function mouseMove(e) {
-    //console.log(e.clientX, e.clientY)
     newPosX = startPosX - e.clientX;
     newPosY = startPosY - e.clientY;
 
@@ -250,10 +211,10 @@ function getCellCoords() {
         let bottom = top + cell.offsetHeight
         let midpoint = [(left + right)/2, (top + bottom)/2] 
         let index = findBoardIndices(cell)     
-        //console.log(`left: ${left} \ntop: ${top} \nright: ${right} \nbottom: ${bottom}`)
+        
         coords.push({cell, left, top, right, bottom, midpoint, index})
     })
-    //console.log(coords)
+
     return coords;
 }
 
@@ -278,18 +239,6 @@ function createBoard() {
             cell.id = index
             cellRow.appendChild(cell)
             index += 1;
-
-/*             cell.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                const targetCircle = document.createElement('div');
-                targetCircle.classList.add('target-circle')
-                cell.appendChild(targetCircle)
-
-                target = findBoardIndices(cell)
-                console.log(target)
-            })
- */     
-
         }
         cellRow.style.cssText = `
         grid-template-columns: repeat(${y.length}, 1fr);
@@ -302,7 +251,6 @@ function createBoard() {
         boardContainer.appendChild(cellRow);
         row += 1;
     }
-
 
     boardContainer.style.cssText = `
         display:grid;
@@ -352,16 +300,22 @@ function updateKnightDimensions() {
 }
 
 document.querySelector('.calculate-button').addEventListener('click', () => {
-    
+    const solutionText = document.querySelector('.solution')
+    if (currentPos.length == 0) {
+        solutionText.textContent = 'Select a position and target!'
+        return
+    }
+
     let path = new Moves(currentPos);
     let correctMoves = path.buildTree();
     console.log(correctMoves)
-    const solutionText = document.querySelector('.solution')
+    
+    
     solutionText.textContent = ''
     correctMoves.forEach((e) => {
         solutionText.textContent += `[${e}]\n`
     })
-    animateKnight(correctMoves)
+    animateKnight(correctMoves, path.root)
 })
 
 let knightStartCoords = [knight.offsetTop, knight.offsetLeft]
@@ -376,30 +330,26 @@ createBoard();
 checkBoardStatus();
 
 let id = null;
-function animateKnight (moveArray){
+function animateKnight (moveArray, path){
     
     function getMidCoords() {
         let coordsArray = [];
         moveArray.forEach(move => {
             coords.forEach((coord => {
-                //console.log(coord.index, move)
                 if (arrayEqualsArray(coord.index, move)){
                     coordsArray.push([coord.midpoint, coord.index]);
                     return
                 };
             }));
         });
-        //console.log(coordsArray)
         return coordsArray;
     }
     const midCoords = getMidCoords()
-    console.log(midCoords)
 
     let knightDimensions = [knight.offsetWidth, knight.offsetHeight]
     let currentTargets = midCoords.map((coord) => {
         return [coord[0][0]-knightDimensions[0]/2, coord[0][1]-knightDimensions[1]/2]
     })
-    //console.log(currentTargets)
 
     let posX = Number(knight.style.left.replace('px', ''));
     let posY = Number(knight.style.top.replace('px', ''));
@@ -411,40 +361,44 @@ function animateKnight (moveArray){
     });
 
     function moveToTarget(target){
-        //console.log(target)
         if (posX > target[0]) {
-            //console.log(posX,  target[0])
             timeline.add({
                 translateX: -(posX-target[0])
             })
         }
  
         else if (posX < target[0]) {
-            //console.log(posX,  target[0])
             timeline.add({
                 translateX: target[0]-posX
             })
         }
         if (posY > target[1]) {
-            //console.log(posY,  target[1])
             timeline.add({
                 translateY: -(posY-target[1])
             })
         }
  
         else if (posY < target[1]) {
-            //console.log(posY,  target[1])
             timeline.add({
                 translateY: target[1]-posY
             })          
         }
     }
-
-    moveToTarget(currentTargets[0])
-    timeline.finished.then(updateParams)
+    let children = path.children
+    children.forEach((e) => {
+        displayPaths(e.data)
+        if (e.data == moveArray[0]){
+            children = e.children
+        }
+    })
+    if (currentTargets.length != 0){
+        moveToTarget(currentTargets[0])
+        timeline.finished.then(updateParams)
+    }
     
     let index = 0
     function updateParams() {
+        removePaths()
         //Reset timeline to 0
         timeline = anime.timeline({
             targets: '.knight',
@@ -457,7 +411,6 @@ function animateKnight (moveArray){
         knight.style.left = currentTargets[index][0] + 'px'
         knight.style.top = currentTargets[index][1] + 'px'
         currentPos = midCoords[index][1]
-        //console.log(knight.style.left, knight.style.top)
 
         //Updates posX and posY
         posX = Number(knight.style.left.replace('px', ''));
@@ -468,6 +421,14 @@ function animateKnight (moveArray){
         if (index >= currentTargets.length){return}      
     
         //Adds X and Y promises to the timeline, then once finished, updates again
+        //displayPaths(path, moveArray)
+        
+        children.forEach((e) => {
+            displayPaths(e.data)
+            if (e.data == moveArray[index]){
+                children = e.children
+            }
+        })
         moveToTarget(currentTargets[index])
         timeline.finished.then(updateParams)
     }
@@ -475,3 +436,14 @@ function animateKnight (moveArray){
     
 console.log(coords)
 
+function displayPaths(cell) {
+    let cellDom = coords.filter(item => arrayEqualsArray(item.index, cell)).map(item => item.cell)[0];
+    const moveDot = document.createElement('div');
+    moveDot.classList.add('move-dot')
+    cellDom.appendChild(moveDot)
+}
+function removePaths(){
+    document.querySelectorAll('.move-dot').forEach((dot) => {
+        dot.remove()
+    })
+}

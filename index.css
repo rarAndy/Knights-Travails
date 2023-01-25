@@ -42,3 +42,13 @@
     z-index: 3;
 
 }
+
+.move-dot {
+    position:absolute;
+    
+    border-radius: 50%;
+    opacity: 60%;
+
+    border: 7px solid grey;
+    z-index: 5;
+}
