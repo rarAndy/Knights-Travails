@@ -1,4 +1,4 @@
-import {arrayEqualsArray, isArrayInArray} from './arrayFunctions.js'
+import {arrayEqualsArray, isArrayInArray} from './arrayFunctions.js';
 import anime from './node_modules/animejs/lib/anime.es.js';
 
 
