@@ -142,8 +142,17 @@ knight.addEventListener('mousedown', function(e){
 });
 
 function mouseUp() {
-    console.log(mid[0])
-    currentPos = findBoardIndices(mid[0])
+    //console.log(mid[0])
+    /* const headerDom = document.querySelector('.header');
+    const headerHeight = headerDom.offsetHeight */
+    try {
+        currentPos = findBoardIndices(mid[0])
+    } catch {
+        initializeKnight();
+        document.removeEventListener('mousemove', mouseMove);
+        document.removeEventListener('mouseup', mouseUp)
+        return;
+    }
     console.log('knightPos', currentPos)
     newPosX = mid[1];
     newPosY = mid[2]; 
@@ -254,8 +263,7 @@ function createBoard() {
 
     boardContainer.style.cssText = `
         display:grid;
-        width:500px;
-        height:500px;
+        
         grid-template-rows: repeat(${x.length}, 1fr);
         grid-template-columns: repeat(${y.length}, 1fr);
         border: 1px solid black;
@@ -275,7 +283,7 @@ function addTargets () {
             })
             targetCircle.classList.add('target-circle')
             cell.appendChild(targetCircle)
-            console.log(cell)
+            //console.log(cell)
             target = findBoardIndices(cell)
             console.log('target', target)
         })
@@ -301,8 +309,8 @@ function updateKnightDimensions() {
 
 document.querySelector('.calculate-button').addEventListener('click', () => {
     const solutionText = document.querySelector('.solution')
-    if (currentPos.length == 0) {
-        solutionText.textContent = 'Select a position and target!'
+    if (currentPos.length == 0 || target.length == 0) {
+        //solutionText.textContent = 'Select a position and target!'
         return
     }
 
@@ -319,14 +327,18 @@ document.querySelector('.calculate-button').addEventListener('click', () => {
 })
 
 let knightStartCoords = [knight.offsetTop, knight.offsetLeft]
-console.log(knightStartCoords)
+//console.log(knightStartCoords)
 function initializeKnight() {
-    knight.style.top = knightStartCoords[0] + 502 + "px";
-    knight.style.left = knightStartCoords[1] + "px";
+    updateKnightDimensions();
+    const calculateButton = document.querySelector('.calculate-button');
+    const calcDims = calculateButton.getBoundingClientRect()
+    //console.log(calcDims)
+    knight.style.top = calcDims.y + 'px'
+    knight.style.left = calcDims.x + 150 + "px";
 }
 
-
 createBoard();
+initializeKnight();
 checkBoardStatus();
 
 let id = null;
@@ -434,7 +446,7 @@ function animateKnight (moveArray, path){
     }
 }
     
-console.log(coords)
+//console.log(coords)
 
 function displayPaths(cell) {
     let cellDom = coords.filter(item => arrayEqualsArray(item.index, cell)).map(item => item.cell)[0];
@@ -447,3 +459,13 @@ function removePaths(){
         dot.remove()
     })
 }
+
+window.addEventListener("resize", (event) => {
+    createBoard();
+    getCellCoords();
+    console.log(coords)
+    addTargets();
+    initializeKnight();
+    updateKnightDimensions();
+    document.querySelector('.solution').textContent = ''
+});

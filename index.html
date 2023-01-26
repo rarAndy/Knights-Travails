@@ -9,25 +9,38 @@
 </head>
 <body>
     <div class="header">
-
+        <h1>Knights Travails</h1>
     </div>
     <div class="body">
-        <p>Drag the knight to a square on the board.</p>
-        <p><br>Right click a square to select a target.</p>
-        <p><br>Press Calculate to find the shortest path from the knight to the target!</p>
-        <div class="board-container">
-            
+        <div class="steps">
+            <p>Drag the knight to a square on the board.</p>
+            <p>Right click a square to select a target.</p>
+            <p>Press Calculate to find the shortest path from the knight to the target!</p>
         </div>
-        <button class="calculate-button">Calculate</button>
         
-        <img class='knight' src="./knight.svg">
-        <div class="board-size">
-            <input type="range" min="8" max="50" value="8" class="slider" id="board-size-range">
+        <div class="main-container">
+            <div class="board-container">
+            
+            </div>
+            <div class="button-container">
+                <button class="calculate-button">Calculate</button>
+            </div>
+            
+            <img class='knight' src="./knight.svg">
+            <div class="board-size-slider">
+                <p>Change Board Size</p>
+                <input type="range" min="8" max="50" value="8" class="slider" id="board-size-range">
+            </div>
         </div>
-        <div class="solution"></div>
+        <div class="solution-div">
+            <p>Solution</p>
+            <div class="solution">
+                
+            </div>
+        </div>
     </div>
     <div class="footer">
-
+        <a>https://github.com/rarAndy/</a>
     </div>
     <script type="module" src="script.js"></script>
 </body>
